@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JoSAA Cut-off Book Maker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0b0f1a;
+            --bg2: #131a2a;
+            --bg3: #1c2438;
+            --border: #2a3350;
+            --border2: #3c4a70;
+            --text: #e8eefc;
+            --text2: #93a0c0;
+            --text3: #6b7794;
+            --saffron: #ff9933;
+            --saffron2: #ffcc66;
+            --green: #138808;
+            --green2: #3fb950;
+            --navy: #1d3a8a;
+            --blue: #1f4fd8;
+            --blue2: #4f8cff;
+            --red: #da3633;
+            --red2: #f85149;
+            --purple2: #a371f7;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ═══════════════ TOP HEADER ═══════════════ */
+        .top-header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(11,15,26,0.97);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px; height: 60px;
+            display: flex; align-items: center; justify-content: space-between; gap: 16px;
+        }
+        .header-brand { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .header-mono {
+            width: 36px; height: 36px; border-radius: 50%;
+            display: grid; place-items: center;
+            background: conic-gradient(from 210deg, var(--saffron), var(--saffron2), var(--green), var(--navy), var(--saffron));
+            padding: 2px;
+            box-shadow: 0 0 12px rgba(255,153,51,0.4);
+        }
+        .header-mono span {
+            width: 100%; height: 100%; border-radius: 50%;
+            background: var(--bg2); display: grid; place-items: center;
+            font-weight: 900; font-size: 14px;
+            background-image: none; color: var(--saffron2);
+        }
+        .header-logo {
+            width: 40px; height: 40px; border-radius: 50%;
+            border: 2px solid var(--saffron); object-fit: cover;
+            box-shadow: 0 0 14px rgba(255,153,51,0.45);
+        }
+        .header-title {
+            font-size: 15px; font-weight: 800;
+            background: linear-gradient(90deg, var(--saffron2), var(--saffron));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap;
+        }
+        .header-sub { font-size: 10px; color: var(--text3); font-weight: 400; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+        .header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .header-badge {
+            display: flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 20px;
+            background: rgba(19,136,8,0.15); border: 1px solid rgba(63,185,80,0.3);
+            font-size: 11px; font-weight: 600; color: var(--green2);
+        }
+        .pulse-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green2); animation: pulse 1.8s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.4); } }
+
+        /* ═══════════════ LAYOUT ═══════════════ */
+        .app-shell { display: grid; grid-template-columns: 340px 1fr; min-height: calc(100vh - 60px); }
+
+        /* ═══════════════ SIDEBAR ═══════════════ */
+        .sidebar { background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: sticky; top: 60px; height: calc(100vh - 60px); overflow: hidden; }
+        .sidebar-section { padding: 16px; border-bottom: 1px solid var(--border); }
+        .sidebar-section:last-child { border-bottom: none; flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+        .sidebar-label { display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text3); margin-bottom: 10px; }
+        .sidebar-label i { font-size: 11px; }
+        .path-row { display: flex; gap: 6px; align-items: center; }
+        .path-input {
+            flex: 1; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
+            padding: 7px 10px; color: var(--text); font-size: 10px;
+            font-family: 'JetBrains Mono', monospace; outline: none; transition: border-color 0.2s; min-width: 0;
+        }
+        .path-input:focus { border-color: var(--blue2); }
+        .icon-btn {
+            width: 30px; height: 30px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg3);
+            color: var(--text2); cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; transition: all 0.2s; flex-shrink: 0;
+        }
+        .icon-btn:hover { background: var(--bg2); border-color: var(--border2); color: var(--text); }
+        .icon-btn.green:hover { background: rgba(19,136,8,0.2); border-color: var(--green2); color: var(--green2); }
+        .icon-btn.red:hover { background: rgba(218,54,51,0.2); border-color: var(--red2); color: var(--red2); }
+        .save-confirm { font-size: 10px; color: var(--green2); margin-top: 4px; display: none; align-items: center; gap: 4px; }
+
+        /* Institute filter tabs */
+        .kind-tabs { display: flex; gap: 4px; background: var(--bg3); padding: 4px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 10px; }
+        .kind-tab { flex: 1; padding: 6px 4px; border-radius: 7px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.15s; border: none; background: transparent; color: var(--text2); }
+        .kind-tab:hover { background: var(--bg2); color: var(--text); }
+        .kind-tab.active { background: var(--blue); color: #fff; }
+        .kind-tab .cnt { display: block; font-size: 9px; opacity: 0.7; font-weight: 600; }
+
+        .search-input { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px 8px 32px; color: var(--text); font-size: 12px; outline: none; transition: border-color 0.2s; }
+        .search-input:focus { border-color: var(--blue2); }
+        .search-wrap { position: relative; margin-bottom: 8px; }
+        .search-wrap i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 12px; pointer-events: none; }
+
+        .college-list { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
+        .college-list::-webkit-scrollbar { width: 4px; }
+        .college-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+        .college-item { padding: 8px 10px; border-radius: 8px; cursor: pointer; transition: all 0.15s; margin-bottom: 2px; border: 1px solid transparent; }
+        .college-item:hover { background: var(--bg3); border-color: var(--border); }
+        .college-item.active { background: rgba(31,79,216,0.15); border-color: rgba(79,140,253,0.4); }
+        .college-item-name { font-size: 11px; font-weight: 600; color: var(--text); line-height: 1.3; }
+        .college-item-meta { font-size: 10px; color: var(--text3); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+        .kind-chip { display: inline-block; padding: 1px 5px; border-radius: 4px; font-size: 8.5px; font-weight: 800; margin-right: 5px; }
+        .kind-chip.IIT { background: rgba(255,153,51,0.18); color: var(--saffron2); }
+        .kind-chip.NIT { background: rgba(29,58,138,0.35); color: #93c5fd; }
+        .kind-chip.IIIT { background: rgba(19,136,8,0.22); color: var(--green2); }
+
+        /* ═══════════════ MAIN ═══════════════ */
+        .main-content { display: flex; flex-direction: column; overflow: auto; }
+
+        .control-bar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .quota-badges { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+        .quota-pill {
+            display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px;
+            font-size: 10px; font-weight: 700; border: 1px solid; transition: all 0.2s; cursor: default;
+        }
+        .quota-pill.avail { background: rgba(19,136,8,0.18); border-color: rgba(63,185,80,0.5); color: var(--green2); }
+        .quota-pill.unavail { background: rgba(28,36,56,0.5); border-color: var(--border); color: var(--text3); }
+        .quota-pill i { font-size: 9px; }
+
+        .control-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        .mode-tabs { display: flex; gap: 4px; background: var(--bg3); padding: 4px; border-radius: 10px; border: 1px solid var(--border); }
+        .mode-tab { padding: 5px 12px; border-radius: 7px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: none; background: transparent; color: var(--text2); white-space: nowrap; }
+        .mode-tab:hover { background: var(--bg2); color: var(--text); }
+        .mode-tab.active { background: var(--blue); color: #fff; }
+
+        .btn {
+            display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px;
+            font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid; transition: all 0.2s;
+            white-space: nowrap; text-decoration: none;
+        }
+        .btn-build { background: rgba(255,153,51,0.15); border-color: rgba(255,153,51,0.4); color: var(--saffron2); }
+        .btn-build:hover { background: rgba(255,153,51,0.3); border-color: var(--saffron); }
+        .btn-docx { background: rgba(31,79,216,0.15); border-color: rgba(79,140,253,0.4); color: var(--blue2); }
+        .btn-docx:hover { background: rgba(31,79,216,0.3); border-color: var(--blue2); }
+        .btn-print { background: var(--bg3); border-color: var(--border); color: var(--text2); }
+        .btn-print:hover { background: var(--bg2); border-color: var(--border2); color: var(--text); }
+        .btn-scan { background: rgba(19,136,8,0.15); border-color: rgba(63,185,80,0.4); color: var(--green2); }
+        .btn-scan:hover { background: rgba(19,136,8,0.3); border-color: var(--green2); }
+
+        /* ═══════════════ BOOK AREA ═══════════════ */
+        .book-area { flex: 1; padding: 24px; }
+
+        .college-header-card {
+            background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+            padding: 20px 24px; margin-bottom: 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 20px;
+        }
+        .college-name-block { flex: 1; min-width: 0; }
+        .college-full-name { font-size: 18px; font-weight: 800; color: var(--saffron2); line-height: 1.3; margin-bottom: 6px; }
+        .college-address { font-size: 11px; color: var(--text2); display: flex; align-items: center; gap: 6px; }
+        .college-meta-tags { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+        .meta-tag { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 600; text-align: right; max-width: 320px; line-height: 1.4; }
+        .meta-tag.gold { background: rgba(255,153,51,0.15); border: 1px solid rgba(255,153,51,0.3); color: var(--saffron2); }
+        .meta-tag.blue { background: rgba(31,79,216,0.15); border: 1px solid rgba(79,140,253,0.3); color: var(--blue2); }
+
+        /* Progress */
+        .progress-card { background: var(--bg2); border: 1px solid rgba(255,153,51,0.3); border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; display: none; }
+        .progress-card.show { display: block; }
+        .progress-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .progress-title { display: flex; align-items: center; gap: 10px; }
+        .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,153,51,0.3); border-top-color: var(--saffron2); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .progress-pct { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; color: var(--saffron2); }
+        .progress-track { width: 100%; height: 6px; background: var(--bg3); border-radius: 6px; overflow: hidden; border: 1px solid var(--border); }
+        .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--saffron2), var(--green2)); border-radius: 6px; transition: width 0.3s ease; }
+        .progress-status { font-size: 11px; color: var(--text2); margin-top: 6px; }
+
+        /* Report card */
+        .report-card { background: rgba(19,136,8,0.08); border: 1px solid rgba(63,185,80,0.3); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; display: none; font-size: 11.5px; color: var(--text2); line-height: 1.8; }
+        .report-card.show { display: block; }
+        .report-card b { color: var(--green2); }
+
+        /* Tables */
+        .table-section { margin-bottom: 28px; }
+        .table-section-title { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+        .icon-circle { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+        .icon-circle.ai { background: rgba(255,153,51,0.2); color: var(--saffron2); }
+        .icon-circle.hs { background: rgba(19,136,8,0.2); color: var(--green2); }
+        .icon-circle.os { background: rgba(29,58,138,0.3); color: #93c5fd; }
+        .table-title-text { font-size: 14px; font-weight: 700; color: var(--text); }
+
+        .cutoff-table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+        .cutoff-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        .cutoff-table thead th {
+            background: #16233c; color: #93c5fd; font-weight: 700; padding: 9px 8px; text-align: center;
+            border-bottom: 2px solid var(--blue); white-space: nowrap; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .cutoff-table thead th:first-child { text-align: left; padding-left: 14px; width: 220px; }
+        .cutoff-table thead th.grp-branch {
+            font-size: 11px; letter-spacing: 1.2px; color: #ffd79a; background: #1b2c4d;
+            width: 220px; text-align: left; padding-left: 14px;
+        }
+        .cutoff-table thead th.grp-gender {
+            font-size: 11px; letter-spacing: 1.2px; color: #ffd79a; background: #1b2c4d; width: 92px;
+        }
+        .cutoff-table thead th.grp {
+            font-size: 13px; font-weight: 800; letter-spacing: 1.6px; color: #dbeafe;
+            background: #1d3055; border-left: 2px solid rgba(42,51,80,0.9);
+            padding: 12px 14px; width: 15%;
+        }
+        .cutoff-table thead th.grp-open {
+            font-size: 16px; letter-spacing: 3px; color: #ffffff;
+            background: linear-gradient(180deg, #2a4a92 0%, #1d3055 100%);
+            border-left: 2px solid rgba(42,51,80,0.9);
+            border-bottom: 3px solid var(--saffron);
+            text-shadow: 0 0 10px rgba(147,197,253,0.45);
+        }
+        .cutoff-table thead tr.sub th { font-size: 9px; color: var(--text2); border-bottom: 1px solid var(--border); padding: 4px 8px; }
+        .cutoff-table thead tr.sub th.grp-open-sub { color: #ffd79a; font-weight: 700; }
+        .cutoff-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+        .cutoff-table tbody tr:hover { background: rgba(79,140,253,0.07); }
+        .cutoff-table tbody td { padding: 7px 8px; text-align: center; border-bottom: 1px solid rgba(42,51,80,0.6); font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text); }
+        .cutoff-table tbody td:first-child { text-align: left; padding-left: 14px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; color: var(--saffron2); }
+        .cutoff-table tbody td.branch-cell { vertical-align: middle; background: rgba(255,153,51,0.05); border-right: 2px solid rgba(42,51,80,0.9); }
+        .cutoff-table tbody td.gender-cell { text-align: center; font-family: 'Inter', sans-serif; font-size: 10px; color: var(--text2); font-weight: 700; }
+        .cutoff-table tbody td.gender-male { color: #7dd3fc; background: rgba(125,211,252,0.07); }
+        .cutoff-table tbody td.gender-female { color: #f9a8d4; background: rgba(249,168,212,0.07); }
+        .val-open { color: var(--blue2); font-weight: 700; }
+        .val-close { color: var(--text2); font-weight: 500; display: block; font-size: 9px; }
+        .val-missing { color: var(--text3); }
+
+        /* Placeholder */
+        .placeholder-state { text-align: center; padding: 80px 40px; color: var(--text3); }
+        .placeholder-state i { font-size: 48px; margin-bottom: 16px; color: var(--border2); }
+        .placeholder-state h3 { font-size: 16px; font-weight: 600; color: var(--text2); margin-bottom: 8px; }
+        .placeholder-state p { font-size: 12px; line-height: 1.6; }
+
+        @media print {
+            .top-header, .sidebar, .control-bar, .no-print, .progress-card, .report-card { display: none !important; }
+            .app-shell { grid-template-columns: 1fr; }
+            .main-content { overflow: visible; }
+            body { background: white; color: black; }
+            .college-header-card, .table-section { page-break-inside: avoid; }
+            .cutoff-table thead th { background: #1e3a8a; color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .cutoff-table thead th.grp, .cutoff-table thead th.grp-open, .cutoff-table thead th.grp-branch,
+            .cutoff-table thead th.grp-gender { background: #1e3a8a !important; color: white !important; text-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .cutoff-table tbody td.branch-cell { background: #f3f4f6 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .cutoff-table tbody td.gender-male { color: #0369a1 !important; background: #e0f2fe !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .cutoff-table tbody td.gender-female { color: #be185d !important; background: #fce7f3 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .cutoff-table tbody td { color: black; border-color: #ccc; }
+            .college-full-name { color: #b45309; }
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+        .user-chip { display: inline-flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--saffron2); background: rgba(255,153,51,0.12); border: 1px solid rgba(255,204,102,0.35); padding: 4px 10px; border-radius: 20px; }
+        .logout-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; letter-spacing: .4px; color: var(--text2); background: rgba(28,36,56,0.5); border: 1px solid var(--border2); padding: 5px 11px; border-radius: 20px; text-decoration: none; transition: all .18s; }
+        .logout-btn:hover { color: var(--red2); border-color: rgba(248,81,73,0.5); background: rgba(248,81,73,0.1); }
+    </style>
+</head>
+<body>
+
+    <header class="top-header no-print">
+        <div class="header-brand">
+            <img src="/static/logo.jpg" alt="JoSAA" class="header-logo"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+            <div class="header-mono" style="display:none;"><span>JS</span></div>
+            <div>
+                <div class="header-title">JoSAA Cut-off Book Maker</div>
+                <div class="header-sub">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    IIT &middot; NIT &middot; IIIT &middot; GFTI Book Builder
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="header-badge">
+                <div class="pulse-dot"></div>
+                <span id="headerStatus">Ready</span>
+            </div>
+            {% if logged_user %}
+            <span class="user-chip"><i class="fa-solid fa-circle-user"></i> {{ logged_user }}</span>
+            {% endif %}
+            <a href="/logout" class="logout-btn" title="Logout">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </a>
+        </div>
+    </header>
+
+    <div class="app-shell">
+
+        <aside class="sidebar no-print">
+
+            <div class="sidebar-section">
+                <div class="sidebar-label">
+                    <i class="fa-solid fa-file-excel" style="color:#3fb950"></i> Excel Data Source
+                </div>
+                <div class="path-row">
+                    <input type="text" id="excelPath" value="{{ excel_path }}" class="path-input" placeholder="JoSAA Excel file path...">
+                    <button class="icon-btn green" onclick="saveCfg()" title="Save"><i class="fa-solid fa-floppy-disk"></i></button>
+                </div>
+
+                <div class="sidebar-label" style="margin-top:14px;">
+                    <i class="fa-solid fa-file-word" style="color:#4f8cff"></i> Word Template
+                </div>
+                <div class="path-row">
+                    <input type="text" id="templatePath" value="{{ template_path }}" class="path-input" placeholder="Word template path...">
+                    <button class="icon-btn green" onclick="saveCfg()" title="Save"><i class="fa-solid fa-floppy-disk"></i></button>
+                </div>
+
+                <div class="sidebar-label" style="margin-top:14px;">
+                    <i class="fa-solid fa-folder-open" style="color:#ffcc66"></i> Output Folder
+                </div>
+                <div class="path-row">
+                    <input type="text" id="outputDir" value="{{ output_dir }}" class="path-input" placeholder="Output folder...">
+                    <button class="icon-btn green" onclick="saveCfg()" title="Save"><i class="fa-solid fa-floppy-disk"></i></button>
+                </div>
+                <div class="save-confirm" id="saveConfirm"><i class="fa-solid fa-check-circle"></i> Saved!</div>
+
+                <div style="display:flex; gap:6px; margin-top:10px;">
+                    <button class="btn btn-scan" style="flex:1; justify-content:center;" onclick="scanInstitutes({force:true})" id="btnScan" title="Re-read the Excel from disk">
+                        <i class="fa-solid fa-rotate"></i> Refresh Excel
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar-section" style="flex:1; overflow:hidden; display:flex; flex-direction:column;">
+                <div class="sidebar-label">
+                    <i class="fa-solid fa-building-columns" style="color:#4f8cff"></i> Select Institute
+                    <span id="instCount" style="margin-left:auto; font-weight:700; color:#ffcc66; font-size:10px; text-transform:none; letter-spacing:0;">—</span>
+                </div>
+                <div class="kind-tabs" id="kindTabs">
+                    <button class="kind-tab active" onclick="setKind('ALL')">All<span class="cnt" id="cntAll">—</span></button>
+                    <button class="kind-tab" onclick="setKind('IIT')">IIT<span class="cnt" id="cntIIT">—</span></button>
+                    <button class="kind-tab" onclick="setKind('NIT')">NIT<span class="cnt" id="cntNIT">—</span></button>
+                    <button class="kind-tab" onclick="setKind('IIIT')">IIIT<span class="cnt" id="cntIIIT">—</span></button>
+                </div>
+                <div class="search-wrap">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="instSearch" class="search-input" placeholder="Search institute name..." oninput="filterInstitutes()">
+                </div>
+                <div class="college-list" id="instList">
+                    <div style="text-align:center; padding:32px 16px; color:var(--text3);">
+                        <i class="fa-solid fa-circle-info" style="font-size:20px; margin-bottom:10px;"></i>
+                        <div style="font-size:11px;">Click "Scan Excel" to load institutes.</div>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+        <div class="main-content">
+
+            <div class="control-bar no-print">
+                <div class="quota-badges">
+                    <div class="quota-pill unavail" id="badgeAI"><i class="fa-solid fa-circle"></i> AI</div>
+                    <div class="quota-pill unavail" id="badgeHS"><i class="fa-solid fa-circle"></i> Home State</div>
+                    <div class="quota-pill unavail" id="badgeOS"><i class="fa-solid fa-circle"></i> Other State</div>
+                    <div class="quota-pill unavail" id="badgeEWS"><i class="fa-solid fa-circle"></i> EWS</div>
+                    <div class="quota-pill unavail" id="badgeFemale"><i class="fa-solid fa-venus"></i> Female-only</div>
+                    <div class="quota-pill unavail" id="badgePwD"><i class="fa-solid fa-ban"></i> PwD filtered</div>
+                </div>
+                <div class="control-actions">
+                    <div class="mode-tabs" id="modeTabs">
+                        <button class="mode-tab active" onclick="setMode('ALL')">All</button>
+                        <button class="mode-tab" onclick="setMode('AI')">AI</button>
+                        <button class="mode-tab" onclick="setMode('HS')">HS</button>
+                        <button class="mode-tab" onclick="setMode('OS')">OS</button>
+                    </div>
+                    <a id="btnDocx" href="/api/download-book" target="_blank" class="btn btn-docx" title="Download built book">
+                        <i class="fa-solid fa-file-word"></i> Book DOCX
+                    </a>
+                    <button onclick="window.print()" class="btn btn-print" title="Print / Save as PDF">
+                        <i class="fa-solid fa-print"></i>
+                    </button>
+                    <button onclick="buildBook()" id="btnBuild" class="btn btn-build" title="Rebuild full Word book from Excel">
+                        <i class="fa-solid fa-hammer"></i> Build Book
+                    </button>
+                </div>
+            </div>
+
+            <div class="book-area" id="bookArea">
+
+                <div class="progress-card" id="progressCard">
+                    <div class="progress-header">
+                        <div class="progress-title">
+                            <div class="spinner"></div>
+                            <div>
+                                <div style="font-size:13px;font-weight:700;">Building the full JoSAA book...</div>
+                                <div class="progress-status" id="progressStatus">Starting...</div>
+                            </div>
+                        </div>
+                        <div class="progress-pct" id="progressPct">0%</div>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+
+                <div class="report-card" id="reportCard">
+                    <div id="reportBody"></div>
+                </div>
+
+                <div id="bookContainer">
+                    <div class="placeholder-state">
+                        <i class="fa-solid fa-book-open"></i>
+                        <h3>Select an Institute to View Cut-off Table</h3>
+                        <p>Scan the Excel first, then pick any IIT / NIT / IIIT from the left.<br>Use "Build Book" to generate the full Word document.</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+<script>
+    /* ═══════════════ STATE ═══════════════ */
+    let ALL_INSTITUTES = [];
+    let CURRENT_KIND = 'ALL';
+    let CURRENT_MODE = 'ALL';
+    let CURRENT_INST = null;
+    let POLL_TIMER = null;
+
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    /* ═══════════════ CONFIG ═══════════════ */
+    async function saveCfg() {
+        const body = {
+            excel_path: document.getElementById('excelPath').value,
+            template_path: document.getElementById('templatePath').value,
+            output_dir: document.getElementById('outputDir').value,
+        };
+        await fetch('/api/config', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+        const c = document.getElementById('saveConfirm');
+        c.style.display = 'flex';
+        setTimeout(()=> c.style.display='none', 2000);
+    }
+
+    /* ═══════════════ SCAN (auto on load + instant localStorage cache) ═══════════════ */
+    const LS_SCAN = 'josaa_scan_cache_v1';
+    const LS_LAST = 'josaa_scan_last_v1';
+
+    function applyScan(data) {
+        ALL_INSTITUTES = data.institutes;
+        document.getElementById('cntAll').textContent = data.total;
+        document.getElementById('cntIIT').textContent = data.counts.IIT || 0;
+        document.getElementById('cntNIT').textContent = data.counts.NIT || 0;
+        document.getElementById('cntIIIT').textContent = data.counts.IIIT || 0;
+        document.getElementById('instCount').textContent = data.total + ' institutes';
+        document.getElementById('headerStatus').textContent = data.total + ' institutes loaded';
+        filterInstitutes();
+        // Auto-open an institute so the main pane is never empty.
+        if (!CURRENT_INST && ALL_INSTITUTES.length) {
+            let idx = 0;
+            try {
+                const last = JSON.parse(localStorage.getItem(LS_LAST) || 'null');
+                if (last && last.name) {
+                    const found = ALL_INSTITUTES.findIndex(i => i.name === last.name);
+                    if (found >= 0) idx = found;
+                }
+            } catch (e) {}
+            selectInstitute(idx);
+        }
+    }
+
+    function loadLocalScan() {
+        try {
+            const blob = JSON.parse(localStorage.getItem(LS_SCAN) || 'null');
+            if (blob && blob.data && Array.isArray(blob.data.institutes) && blob.data.institutes.length) {
+                return blob.data;
+            }
+        } catch (e) {}
+        return null;
+    }
+
+    async function scanInstitutes(opts) {
+        opts = opts || {};
+        const btn = document.getElementById('btnScan');
+        const quiet = opts.auto && !!loadLocalScan();   // cache already on screen
+        if (!quiet) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Scanning...';
+            document.getElementById('headerStatus').textContent = 'Scanning...';
+        }
+        try {
+            const res = await fetch('/api/scan', {method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({excel_path: document.getElementById('excelPath').value,
+                                      force: !!opts.force})});
+            const data = await res.json();
+            if (data.status !== 'success') { if (!quiet) alert(data.message || 'Scan failed'); return; }
+            applyScan(data);
+            try { localStorage.setItem(LS_SCAN, JSON.stringify({t: Date.now(), data: data})); } catch (e) {}
+        } catch (e) {
+            if (!quiet) alert('Scan error: ' + e);
+            else document.getElementById('headerStatus').textContent = 'Offline - showing cached list';
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-rotate"></i> Refresh Excel';
+        }
+    }
+
+    // Boot: paint the cached list instantly, then refresh in the background.
+    window.addEventListener('DOMContentLoaded', () => {
+        const cached = loadLocalScan();
+        if (cached) applyScan(cached);
+        scanInstitutes({auto: true});
+    });
+
+    /* ═══════════════ LIST ═══════════════ */
+    function setKind(kind) {
+        CURRENT_KIND = kind;
+        document.querySelectorAll('.kind-tab').forEach(t => t.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        filterInstitutes();
+    }
+
+    function filterInstitutes() {
+        const q = (document.getElementById('instSearch').value || '').toLowerCase();
+        const list = document.getElementById('instList');
+        const items = ALL_INSTITUTES.filter(i =>
+            (CURRENT_KIND === 'ALL' || i.kind === CURRENT_KIND) &&
+            (!q || i.name.toLowerCase().includes(q)));
+        if (!items.length) { list.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text3);font-size:11px;">No institutes found.</div>'; return; }
+        list.innerHTML = items.map(i => `
+                <div class="college-item ${(CURRENT_INST && (CURRENT_INST.institute_name || CURRENT_INST.name) === i.name) ? 'active':''}" onclick="selectInstitute(${ALL_INSTITUTES.indexOf(i)})">
+                <div class="college-item-name"><span class="kind-chip ${i.kind}">${i.kind}</span>${esc(i.name)}</div>
+                <div class="college-item-meta">${i.branch_count} branches &middot; ${i.quotas.join(', ') || 'AI'}</div>
+            </div>`).join('');
+    }
+
+    /* ═══════════════ SELECT ═══════════════ */
+    async function selectInstitute(idx) {
+        const meta = ALL_INSTITUTES[idx];
+        if (!meta) return;
+        try { localStorage.setItem(LS_LAST, JSON.stringify({name: meta.name, kind: meta.kind})); } catch (e) {}
+        const res = await fetch('/api/institute', {method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({excel_path: document.getElementById('excelPath').value, name: meta.name, kind: meta.kind})});
+        const data = await res.json();
+        if (data.status !== 'success') { alert(data.message); return; }
+        CURRENT_INST = data.institute;
+        filterInstitutes();
+        renderInstitute(CURRENT_INST);
+    }
+
+    /* ═══════════════ RENDER ═══════════════ */
+    function shortName(p) {
+        return String(p||'')
+            .replace(/\(\s*(4|5|6|8)\s*years.*?\)/i,'')
+            .replace(/Bachelor of Technology|B\.?Tech\.?|Degree/gi,'')
+            .replace(/\s+/g,' ').trim();
+    }
+
+    function quotaLabel(q) {
+        if (q === 'HS') return '50% Home State Quota';
+        if (q === 'OS') return '50% Other State Quota';
+        return 'All India Quota';
+    }
+
+    function renderInstitute(inst) {
+        const m = inst.meta || {};
+        const tags = [];
+        if (m.established && m.established !== '----') tags.push(`<span class="meta-tag gold">Established ${esc(m.established)}</span>`);
+        if (m.total_intake && m.total_intake !== '----') tags.push(`<span class="meta-tag blue">Total Intake: ${esc(m.total_intake)}</span>`);
+        if (m.fees && m.fees !== '----') tags.push(`<span class="meta-tag gold">Fees/Year: ${esc(m.fees)}</span>`);
+
+        const quotas = [...new Set(inst.branches.map(b => b.quota))];
+        const order = ['AI','HS','OS'].filter(q => quotas.includes(q));
+
+        const badges = {AI:false, HS:false, OS:false, EWS:false, Female:false};
+        inst.branches.forEach(b => {
+            if (b.quota==='AI') badges.AI=true;
+            if (b.quota==='HS') badges.HS=true;
+            if (b.quota==='OS') badges.OS=true;
+            Object.keys(b.ranks||{}).forEach(k => {
+                if (k.startsWith('EWS')) badges.EWS=true;
+                if (k.endsWith('-W')) badges.Female=true;
+            });
+        });
+        const setB=(id,on)=>{const e=document.getElementById(id);e.classList.toggle('avail',on);e.classList.toggle('unavail',!on);};
+        setB('badgeAI',badges.AI); setB('badgeHS',badges.HS); setB('badgeOS',badges.OS);
+        setB('badgeEWS',badges.EWS); setB('badgeFemale',badges.Female);
+        setB('badgePwD', true);
+
+        let html = `
+            <div class="college-header-card">
+            <div class="college-name-block">
+                <div class="college-full-name">${esc(inst.institute_name)}</div>
+                <div class="college-address"><i class="fa-solid fa-location-dot"></i> ${esc(m.address||'')} &nbsp; <i class="fa-solid fa-phone"></i> ${esc(m.phone||'')} &nbsp; <i class="fa-solid fa-globe"></i> ${esc(m.web||'')}</div>
+            </div>
+            <div class="college-meta-tags">${tags.join('')}
+                <button class="btn btn-docx" onclick="downloadInstitute()" id="btnInstDocx"
+                        title="Download this institute as a Word file (ranks from Excel)">
+                    <i class="fa-solid fa-file-word"></i> Download Word
+                </button>
+            </div>
+        </div>`;
+
+        const cats = ['OPEN','OBC','EWS','SC','ST'];
+        const catLabel = c => c === 'OBC' ? 'OBC-NCL' : c;
+        order.forEach(q => {
+            if (CURRENT_MODE !== 'ALL' && CURRENT_MODE !== q) return;
+            const rows = inst.branches.filter(b => b.quota === q);
+            if (!rows.length) return;
+            const icon = q==='AI'?'fa-india':(q==='HS'?'fa-house':'fa-earth-asia');
+            html += `
+            <div class="table-section">
+                <div class="table-section-title">
+                    <div class="icon-circle ${q.toLowerCase()}"><i class="fa-solid ${icon}"></i></div>
+                    <div class="table-title-text">${quotaLabel(q)}</div>
+                </div>
+                <div class="cutoff-table-wrap">
+                    <table class="cutoff-table">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" class="grp-branch">BRANCH (INTAKE)</th>
+                                <th rowspan="2" class="grp-gender">GENDER</th>
+                                ${cats.map(c=>`<th colspan="2" class="grp ${c==='OPEN'?'grp-open':''}">${catLabel(c)}</th>`).join('')}
+                            </tr>
+                            <tr class="sub">
+                                ${cats.map(c=>`<th class="${c==='OPEN'?'grp-open-sub':''}">Open</th><th class="${c==='OPEN'?'grp-open-sub':''}">Close</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>`;
+            rows.forEach(b => {
+                const gRows = ['N'];
+                const anyW = cats.map(c => `${c}-W`).some(k => b.ranks && b.ranks[k]);
+                if (anyW) gRows.push('W');
+                gRows.forEach((g, gi) => {
+                    const key = cats.map(c => `${c}-${g}`);
+                    html += `<tr>
+                        ${gi === 0 ? `<td class="branch-cell" rowspan="${gRows.length}">${esc(shortName(b.program_name))}</td>` : ''}
+                        <td class="gender-cell ${g==='N'?'gender-male':'gender-female'}">${g==='N'?'Male':'Female'}</td>`;
+                    key.forEach(k => {
+                        const r = (b.ranks||{})[k];
+                        if (!r || (r[0]==null && r[1]==null)) {
+                            html += `<td class="val-missing">—</td><td class="val-missing">—</td>`;
+                        } else {
+                            const o = r[0]==null?'—':r[0];
+                            const c = r[1]==null?'—':r[1];
+                            html += `<td class="val-open">${o}</td><td class="val-close">${c}</td>`;
+                        }
+                    });
+                    html += `</tr>`;
+                });
+            });
+            html += `</tbody></table></div></div>`;
+        });
+
+        document.getElementById('bookContainer').innerHTML = html;
+    }
+
+    /* ═══════════════ DOWNLOAD THIS INSTITUTE (Word) ═══════════════ */
+    async function downloadInstitute() {
+        if (!CURRENT_INST) { alert('Select an institute first.'); return; }
+        const btn = document.getElementById('btnInstDocx');
+        const orig = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Building...';
+        try {
+            const kind = (ALL_INSTITUTES.find(i => i.name === CURRENT_INST.institute_name) || {}).kind || '';
+            const res = await fetch('/api/download-institute', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    excel_path: document.getElementById('excelPath').value,
+                    name: CURRENT_INST.institute_name,
+                    kind: kind,
+                })
+            });
+            if (!res.ok) {
+                let msg = 'Download failed (' + res.status + ')';
+                try { msg = (await res.json()).message || msg; } catch (e) {}
+                throw new Error(msg);
+            }
+            const cd = res.headers.get('Content-Disposition') || '';
+            const mStar = /filename\*=UTF-8''([^;]+)/i.exec(cd);
+            const mPlain = /filename="?([^";]+)"?/i.exec(cd);
+            let fname = mStar ? decodeURIComponent(mStar[1]) : (mPlain ? mPlain[1] : '');
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fname || (CURRENT_INST.institute_name + '.docx');
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 5000);
+        } catch (e) {
+            alert(e.message || e);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = orig;
+        }
+    }
+
+    function setMode(mode) {
+        CURRENT_MODE = mode;
+        document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        if (CURRENT_INST) renderInstitute(CURRENT_INST);
+    }
+
+    /* ═══════════════ BUILD BOOK ═══════════════ */
+    async function buildBook() {
+        if (!confirm('Rebuild the full Word book from the Excel + template?\nThis may take a few minutes.')) return;
+        await saveCfg();
+        const card = document.getElementById('progressCard');
+        card.classList.add('show');
+        document.getElementById('reportCard').classList.remove('show');
+        document.getElementById('progressPct').textContent = '...';
+        document.getElementById('progressFill').style.width = '30%';
+        document.getElementById('progressStatus').textContent = 'Building the full book...';
+        document.getElementById('headerStatus').textContent = 'Building...';
+        let data;
+        try {
+            const res = await fetch('/api/build-book', {method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({
+                    excel_path: document.getElementById('excelPath').value,
+                    template_path: document.getElementById('templatePath').value,
+                    output_dir: document.getElementById('outputDir').value,
+                })});
+            data = await res.json();
+        } catch (e) {
+            card.classList.remove('show');
+            document.getElementById('headerStatus').textContent = 'Idle';
+            alert('Build request failed (server timeout?).\n' + e);
+            return;
+        }
+        if (data.status !== 'success') { card.classList.remove('show'); alert(data.message); return; }
+        if (data.done) { finishBuild(data.report); return; }   // serverless: built in this same request
+        pollBuild();
+    }
+
+    function finishBuild(r) {
+        if (POLL_TIMER) { clearInterval(POLL_TIMER); POLL_TIMER = null; }
+        document.getElementById('progressPct').textContent = '100%';
+        document.getElementById('progressFill').style.width = '100%';
+        document.getElementById('progressStatus').textContent = 'Book built successfully.';
+        document.getElementById('headerStatus').textContent = 'Book ready';
+        if (r) showReport(r);
+    }
+
+    function pollBuild() {
+        if (POLL_TIMER) clearInterval(POLL_TIMER);
+        POLL_TIMER = setInterval(async () => {
+            const res = await fetch('/api/build-status');
+            const s = await res.json();
+            document.getElementById('progressPct').textContent = s.pct + '%';
+            document.getElementById('progressFill').style.width = s.pct + '%';
+            document.getElementById('progressStatus').textContent = s.msg || '';
+            if (s.error) {
+                clearInterval(POLL_TIMER); POLL_TIMER=null;
+                document.getElementById('headerStatus').textContent = 'Build FAILED';
+                alert('Build failed:\n' + s.error);
+                return;
+            }
+            if (s.done) {
+                finishBuild(s.report);
+            }
+        }, 1500);
+    }
+
+    function showReport(r) {
+        const nb = (r.new_branches||[]).length;
+        const db = (r.dropped_branches||[]).length;
+        let html = `<b>Build complete.</b><br>
+            Institutes rebuilt: <b>${r.institutes}</b> &nbsp;|&nbsp;
+            Matched to Excel: <b>${r.matched}</b> &nbsp;|&nbsp;
+            Data rows: <b>${r.rows}</b><br>
+            New branches added: <b>${nb}</b> &nbsp;|&nbsp;
+            Branches dropped (not in Excel): <b>${db}</b>`;
+        if (r.fit) html += `<br>One-page fit: <b>${r.fit.checked}</b> tables checked, <b>${(r.fit.shrunk||[]).length}</b> shrunk, <b>${(r.fit.still_split||[]).length}</b> still split`;
+        if (r.index) html += `<br>Index pages fixed: <b>${r.index.updated}</b>, missing: <b>${(r.index.missing||[]).length}</b>`;
+        if (r.word_error) html += `<br><span style="color:var(--red2)">Word step error: ${esc(r.word_error)}</span>`;
+        if (db && r.dropped_branches) html += `<br><span style="color:var(--text3);font-size:10px">Dropped: ${r.dropped_branches.slice(0,8).map(esc).join('; ')}${db>8?' …':''}</span>`;
+        document.getElementById('reportBody').innerHTML = html;
+        document.getElementById('reportCard').classList.add('show');
+    }
+</script>
+</body>
+</html>
