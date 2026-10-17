@@ -1,0 +1,6 @@
+flask
+python-docx
+pandas
+openpyxl
+lxml
+pywin32; platform_system == "Windows"
